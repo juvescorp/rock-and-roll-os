@@ -13,4 +13,4 @@ loop:
 halt: 
     hlt # halt the system // остановить систему
 msg:
-    .asciz "Welcome to rock'n'roll OS!" # string for printing, ending with zero // строка для вывода, заканчивается нулём
+    .asciz "Welcome to rock'n'roll OS!!!" # string for printing, ending with zero // строка для вывода, заканчивается нулём
