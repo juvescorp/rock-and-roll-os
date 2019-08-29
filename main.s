@@ -6,7 +6,8 @@ loop:
     lodsb // move byte from address ds:si to al and add 1 to si 
     // Считать байт по адресу DS:(E)SI в AL и добавить 1 к SI
     or %al, %al // logical or // логическое или
-    jz halt // if al=0 then halt the system // если al=0, то останавливаем систему
+    jz halt // if zf(zero flag)=0 (means that al=0) then halt the system 
+    // если zf(флаг нуля)=0 (это значит, что al=0), то останавливаем систему
     int $0x10 // print symbol on a screen // вывести символ на экран
     jmp loop // jump to "loop", next step of a cycle // перейти к метке loop, на следующий шаг цикла
 halt: 
