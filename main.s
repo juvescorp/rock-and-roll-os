@@ -3,7 +3,8 @@
     mov $0x0e, %ah // put 0x0e into ah (function of int 10h - print a string) 
     // Положить в ah 0x0e (номер функции int 10h - вывести строку на экран)
 loop:
-    lodsb // move byte from address ds:si to al // Считать байт по адресу DS:(E)SI в AL
+    lodsb // move byte from address ds:si to al and add 1 to si 
+    // Считать байт по адресу DS:(E)SI в AL и добавить 1 к SI
     or %al, %al // logical or // логическое или
     jz halt // if al=0 then halt the system // если al=0, то останавливаем систему
     int $0x10 // print symbol on a screen // вывести символ на экран
