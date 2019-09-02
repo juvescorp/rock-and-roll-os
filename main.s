@@ -10,7 +10,119 @@ loop:
     # если zf(флаг нуля)=0 (это значит, что al=0), то останавливаем систему
     int $0x10 # print symbol on a screen // вывести символ на экран
     jmp loop # jump to "loop", next step of a cycle // перейти к метке loop, на следующий шаг цикла
-halt: 
+halt:
+    mov $0x0a, %al # empty string
+    int $0x10
+
+    mov $0x07, %al # 09 stands for day
+    out %al, $0x70 # requesting current date/time
+    in $0x71, %al # xx-format, 19 - 2019
+    mov %al, %ah
+    and $0x0f, %al
+    add $0x30, %al
+    shr $4, %ah
+    add $0x30, %ah
+    mov %al, %dl
+    mov %ah, %al
+    mov $0x0e, %ah
+    int $0x10
+    mov %dl, %al
+    int $0x10
+
+    mov $0x2d, %al # тире/dash
+    int $0x10
+
+    mov $0x08, %al # 08 stands for month
+    out %al, $0x70 # requesting current date/time
+    in $0x71, %al # xx-format
+    mov %al, %ah
+    and $0x0f, %al
+    add $0x30, %al
+    shr $4, %ah
+    add $0x30, %ah
+    mov %al, %dl
+    mov %ah, %al
+    mov $0x0e, %ah
+    int $0x10
+    mov %dl, %al
+    int $0x10 
+
+    mov $0x2d, %al # тире/dash
+    int $0x10
+
+    mov $0x09, %al # 09 stands for year
+    out %al, $0x70 # requesting current date/time
+    in $0x71, %al # xx-format
+    mov %al, %ah
+    and $0x0f, %al
+    add $0x30, %al
+    shr $4, %ah
+    add $0x30, %ah
+    mov %al, %dl
+    mov %ah, %al
+    mov $0x0e, %ah
+    int $0x10
+    mov %dl, %al
+    int $0x10
+  
+    mov $0x0a, %al # empty string
+    int $0x10
+ 
+    mov $0x04, %al # 04 stands for hours
+    out %al, $0x70 # requesting current date/time
+    in $0x71, %al # xx-format
+    mov %al, %ah
+    and $0x0f, %al
+    add $0x30, %al
+    shr $4, %ah
+    add $0x30, %ah
+    mov %al, %dl
+    mov %ah, %al
+    mov $0x0e, %ah
+    int $0x10
+    mov %dl, %al
+    int $0x10
+
+    mov $0x3a, %al # ":"
+    int $0x10
+
+    mov $0x02, %al # 02 stands for minutes
+    out %al, $0x70 # requesting current date/time
+    in $0x71, %al # xx-format
+    mov %al, %ah
+    and $0x0f, %al
+    add $0x30, %al
+    shr $4, %ah
+    add $0x30, %ah
+    mov %al, %dl
+    mov %ah, %al
+    mov $0x0e, %ah
+    int $0x10
+    mov %dl, %al
+    int $0x10
+
+    mov $0x3a, %al # ":"
+    int $0x10
+
+    mov $0, %al # 0 stands for seconds
+    out %al, $0x70 # requesting current date/time
+    in $0x71, %al # xx-format
+    mov %al, %ah
+    and $0x0f, %al
+    add $0x30, %al
+    shr $4, %ah
+    add $0x30, %ah
+    mov %al, %dl
+    mov %ah, %al
+    mov $0x0e, %ah
+    int $0x10
+    mov %dl, %al
+    int $0x10
+
+
+ 
+# PRINT_HEX <%al>
+#  PRINT_NEWLINE 
     hlt # halt the system // остановить систему
 msg:
     .asciz "Welcome to rock'n'roll OS!!!" # string for printing, ending with zero // строка для вывода, заканчивается нулём
