@@ -14,7 +14,7 @@ halt:
     mov $0x0a, %al # empty string
     int $0x10
 
-    mov $0x07, %al # 09 stands for day
+    mov $0x07, %al # 07 stands for day
     out %al, $0x70 # requesting current date/time
     in $0x71, %al # xx-format, 19 - 2019
     mov %al, %ah
