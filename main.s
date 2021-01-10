@@ -14,7 +14,7 @@ loop:
 halt:
     mov $0x0a, %al # empty string // пустая строка
     int $0x10 # print symbol on a screen //прерывание для вывода символа на экран 
-    mov $0x07, %al # port 07 stands for day // 07 - порт для дня месяца
+    mov $0x07, %al # 07 stands for day // 07 - значение для запроса дня месяца
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
     in $0x71, %al ## get date to al in xx format. 19 stands for 2019
     # Получаем дату в al в формате xx. 19 соответствует 2019.
@@ -37,11 +37,12 @@ halt:
     int $0x10 # print symbol on a screen //прерывание для вывода символа на экран 
     mov $0x2d, %al # тире/dash
     int $0x10 # print symbol on a screen //прерывание для вывода символа на экран 
+#-----------It needs to make a procedures/functions for date output-----------
+#-----------Нужно сделать процедуры/функции для вывода даты-------------------
 
-
-    mov $0x08, %al # 08 stands for month
-    out %al, $0x70 # requesting current date/time
-    in $0x71, %al # xx-format
+    mov $0x08, %al # 08 stands for month // 08 - значение для запроса месяца
+    out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
+    in $0x71, %al # Get current month in xx-format // получение текущего месяца в формате xx
     mov %al, %ah
     and $0x0f, %al
     add $0x30, %al
@@ -57,9 +58,10 @@ halt:
     mov $0x2d, %al # тире/dash
     int $0x10
 
-    mov $0x09, %al # 09 stands for year
-    out %al, $0x70 # requesting current date/time
-    in $0x71, %al # xx-format
+    mov $0x09, %al # 09 stands for year // 09 - значение для запроса года
+    out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
+
+    in $0x71, %al # Get current year in xx-format // Получение текущего года в формате xx
     mov %al, %ah
     and $0x0f, %al
     add $0x30, %al
@@ -72,12 +74,12 @@ halt:
     mov %dl, %al
     int $0x10
   
-    mov $0x0a, %al # empty string
+    mov $0x0a, %al # empty string // пустая строка
     int $0x10
  
-    mov $0x04, %al # 04 stands for hours
-    out %al, $0x70 # requesting current date/time
-    in $0x71, %al # xx-format
+    mov $0x04, %al # 04 stands for hours // 04 - значение для запроса текущего часа 
+    out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
+    in $0x71, %al #Get current year in xx-format // Получение текущего часа в формате xx
     mov %al, %ah
     and $0x0f, %al
     add $0x30, %al
@@ -90,12 +92,12 @@ halt:
     mov %dl, %al
     int $0x10
 
-    mov $0x3a, %al # ":"
+    mov $0x3a, %al # ":" // colon symbol // символ двоеточия
     int $0x10
 
-    mov $0x02, %al # 02 stands for minutes
-    out %al, $0x70 # requesting current date/time
-    in $0x71, %al # xx-format
+    mov $0x02, %al # 02 stands for minutes // 02 - значение для запроса текущей минуты
+    out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
+    in $0x71, %al # Get current minute in xx-format // Получение текущей минуты в формате xx
     mov %al, %ah
     and $0x0f, %al
     add $0x30, %al
@@ -108,12 +110,12 @@ halt:
     mov %dl, %al
     int $0x10
 
-    mov $0x3a, %al # ":"
+    mov $0x3a, %al # ":" // colon symbol // символ двоеточия
     int $0x10
 
-    mov $0, %al # 0 stands for seconds
-    out %al, $0x70 # requesting current date/time
-    in $0x71, %al # xx-format
+    mov $0, %al # 0 stands for seconds // 0 - значение для запроса текущей секнды
+    out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
+    in $0x71, %al # Get current second in xx-format // Получение текущей секунды в формате xx
     mov %al, %ah
     and $0x0f, %al
     add $0x30, %al
