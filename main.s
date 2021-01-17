@@ -1,17 +1,23 @@
 .code16 # tells GAS to output 16-bit code / Компиляция в 16-битный код
+.macro PRINT_TO_SCR # procedure for printing symbol to the screen / макрокоманда (процедура/функция) для вывода символа на экран 
+  mov $0x0e, %ah # load 0e - code of a screen output BIOS function / загрузка 0e, кода функции вывода на экран BIOS
+  int $0x10 # call of BIOS interrupt that will print a symbol on the screen / вызов прерывания BIOS, которое выведет символ на экран
+.endm
+
+
     mov $msg, %si # put msg address into si / Положить адрес сообшщения msg в si
     mov $0x0e, %ah # put 0x0e into ah (function of int 10h - print a string) 
     # Положить в ah 0x0e (номер функции int 10h - вывести строку на экран)
-loop:
+print_welcome:
     lodsb # move byte from address ds:si to al and add 1 to si 
     # Считать байт по адресу DS:(E)SI в AL и добавить 1 к SI
     or %al, %al # logical OR (checking if al=0) 
     # логическое ИЛИ проверка, равен ли нулю al
-    jz halt # if zf(zero flag)=0 (means that al=0) then halt the system 
-    # если zf(флаг нуля)=0 (это значит, что al=0), то останавливаем систему
-    int $0x10 # print symbol on a screen // вывести символ на экран
-    jmp loop # jump to "loop", next step of a cycle // перейти к метке loop, на следующий шаг цикла
-halt:
+    jz print_date # if zf(zero flag)=0 (means that al=0) then print date and time
+    # если zf(флаг нуля)=0 (это значит, что al=0), то переходим к выводу даты и времени
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
+    jmp print_welcome # jump to "loop", next step of a cycle // перейти к метке loop, на следующий шаг цикла
+print_date:
     mov $0x0a, %al # empty string // пустая строка
     int $0x10 # print symbol on a screen //прерывание для вывода символа на экран 
     mov $0x07, %al # 07 stands for day // 07 - значение для запроса дня месяца
