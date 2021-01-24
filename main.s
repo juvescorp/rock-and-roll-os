@@ -6,8 +6,6 @@
 
 
     mov $msg, %si # put msg address into si / Положить адрес сообшщения msg в si
-    mov $0x0e, %ah # put 0x0e into ah (function of int 10h - print a string) 
-    # Положить в ah 0x0e (номер функции int 10h - вывести строку на экран)
 print_welcome:
     lodsb # move byte from address ds:si to al and add 1 to si 
     # Считать байт по адресу DS:(E)SI в AL и добавить 1 к SI
@@ -16,10 +14,10 @@ print_welcome:
     jz print_date # if zf(zero flag)=0 (means that al=0) then print date and time
     # если zf(флаг нуля)=0 (это значит, что al=0), то переходим к выводу даты и времени
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
-    jmp print_welcome # jump to "loop", next step of a cycle // перейти к метке loop, на следующий шаг цикла
+    jmp print_welcome # jump to "print_welcome", next step of a cycle // перейти к метке loop, на следующий шаг цикла
 print_date:
     mov $0x0a, %al # empty string // пустая строка
-    int $0x10 # print symbol on a screen //прерывание для вывода символа на экран 
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
     mov $0x07, %al # 07 stands for day // 07 - значение для запроса дня месяца
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
     in $0x71, %al ## get date to al in xx format. 19 stands for 2019
@@ -36,13 +34,11 @@ print_date:
     add $0x30, %ah # add 30 to get an ASCII code of digit symbol for printing / добавляем 30, чтобы получить ASCII-код символа соответствующей цифры для вывода на экран
     mov %al, %dl # save lower-order HEX-digit to dl / сохраняем младший шестнадцатиричный разряд в dl
     mov %ah, %al # move higher-order HEX-digit to al for further printing / отправляем старший разряд в al для последующего вывода
-    mov $0x0e, %ah # put 0x0e into ah (function of int 10h - print a string) 
-    # Положить в ah 0x0e (номер функции int 10h - вывести строку на экран)
-    int $0x10 # print symbol on a screen //прерывание для вывода символа на экран 
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
     mov %dl, %al # restore dl in al to print a lower-order HEX-digit on a screen / восстановить dl из al для вывода младшего шестнадцатиричного разряда на экран
-    int $0x10 # print symbol on a screen //прерывание для вывода символа на экран 
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
     mov $0x2d, %al # тире/dash
-    int $0x10 # print symbol on a screen //прерывание для вывода символа на экран 
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
 #-----------It needs to make a procedures/functions for date output-----------
 #-----------Нужно сделать процедуры/функции для вывода даты-------------------
 
@@ -56,13 +52,12 @@ print_date:
     add $0x30, %ah
     mov %al, %dl
     mov %ah, %al
-    mov $0x0e, %ah
-    int $0x10
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
     mov %dl, %al
-    int $0x10 
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
 
     mov $0x2d, %al # тире/dash
-    int $0x10
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
 
     mov $0x09, %al # 09 stands for year // 09 - значение для запроса года
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
@@ -75,13 +70,12 @@ print_date:
     add $0x30, %ah
     mov %al, %dl
     mov %ah, %al
-    mov $0x0e, %ah
-    int $0x10
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
     mov %dl, %al
-    int $0x10
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
   
     mov $0x0a, %al # empty string // пустая строка
-    int $0x10
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
  
     mov $0x04, %al # 04 stands for hours // 04 - значение для запроса текущего часа 
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
@@ -93,13 +87,12 @@ print_date:
     add $0x30, %ah
     mov %al, %dl
     mov %ah, %al
-    mov $0x0e, %ah
-    int $0x10
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
     mov %dl, %al
-    int $0x10
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
 
     mov $0x3a, %al # ":" // colon symbol // символ двоеточия
-    int $0x10
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
 
     mov $0x02, %al # 02 stands for minutes // 02 - значение для запроса текущей минуты
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
@@ -111,13 +104,12 @@ print_date:
     add $0x30, %ah
     mov %al, %dl
     mov %ah, %al
-    mov $0x0e, %ah
-    int $0x10
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
     mov %dl, %al
-    int $0x10
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
 
     mov $0x3a, %al # ":" // colon symbol // символ двоеточия
-    int $0x10
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
 
     mov $0, %al # 0 stands for seconds // 0 - значение для запроса текущей секнды
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
@@ -129,10 +121,9 @@ print_date:
     add $0x30, %ah
     mov %al, %dl
     mov %ah, %al
-    mov $0x0e, %ah
-    int $0x10
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
     mov %dl, %al
-    int $0x10
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
 
 
  
