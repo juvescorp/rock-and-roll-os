@@ -27,7 +27,9 @@ print_welcome:
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
     jmp print_welcome # jump to "print_welcome", next step of a cycle // перейти к метке loop, на следующий шаг цикла
 print_date:
-    mov $0x0a, %al # empty string // пустая строка
+    mov $0x0d, %al # Carriage return to the beginning of the string // Возврат каретки в начало строки
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
+    mov $0x0a, %al # jump to next string // переход в начало следующей строки
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
     mov $0x07, %al # 07 stands for day // 07 - значение для запроса дня месяца
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
@@ -84,7 +86,8 @@ print_date:
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
     mov %dl, %al
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
-  
+    mov $0x0d, %al # Carriage return to the beginning of the string // Возврат каретки в начало строки
+    PRINT_TO_SCR # print symbol on a screen // вывести символ на экран
     mov $0x0a, %al # empty string // пустая строка
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
  
