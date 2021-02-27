@@ -4,6 +4,24 @@
   int $0x10 # call of BIOS interrupt that will print a symbol on the screen / вызов прерывания BIOS, которое выведет символ на экран
 .endm
 
+.macro HEX_TO_STR_AND_PRINT # procedure for converting two hex digits in al to symbols and print them / процедура для преобразования в символы и вывода двух шестнадцатиричных цифр, находящихся в al 
+    # Below is the explanation for preparing number for printing
+    # Подготовка к выводу числа на экран показана ниже
+    mov %al, %ah # save al to ah / сохраняем al в ah
+    and $0x0f, %al # AL contains lower digit of the number / AL содержит младший разряд числа
+    add $0x30, %al # add 30 to get an ASCII code of digit symbol for printing / добавляем 30, чтобы получить ASCII-код символа соответствующей цифры для вывода на экран
+    # For example if a digit is 2 the ASCII code will be 32 / Например, если имеем цифру 2, то её ASCII-код будет 32
+    shr $4, %ah # shift ah for 4 binary digits to the right / сдвигаем ah на 4 двоичных цифры вправо
+    # shift is needed for converting a digit in ah to ASCII-code. For the start we need to move this digit to a lower order
+    # сдвиг нужен, чтобы перевести цифру в ah в ASCII-код. Для начала нужно для обработки эту цифру перенести в младший разряд ah 
+    add $0x30, %ah # add 30 to get an ASCII code of digit symbol for printing / добавляем 30, чтобы получить ASCII-код символа соответствующей цифры для вывода на экран
+    mov %al, %dl # save lower-order HEX-digit to dl / сохраняем младший шестнадцатиричный разряд в dl
+    mov %ah, %al # move higher-order HEX-digit to al for further printing / отправляем старший разряд в al для последующего вывода
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
+    mov %dl, %al # restore dl in al to print a lower-order HEX-digit on a screen / восстановить dl из al для вывода младшего шестнадцатиричного разряда на экран
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
+.endm
+
 scan_key:
     mov $0x0,%ah # код функции int 16h. Читает буфер из клавиатуры. Ждёт нажатия клавиши, а затем возвращает результат
     # В ah будет scan-код клавиши.
