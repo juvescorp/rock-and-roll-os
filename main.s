@@ -97,19 +97,22 @@ print_date:
     in $0x71, %al # Get current second in xx-format // Получение текущей секунды в формате xx
     HEX_TO_STR_AND_PRINT
     
-    mov 0, %cl
-    mov 0, %ch
-    mov $0x19, %dh
-    mov $0x50, %dl
-    mov $0x07, %ah
-    mov $0x00, %al
-    int $0x10 # Очистка экрана/прокрутка
+#    mov 0, %cl
+#    mov 0, %ch
+#    mov $0x19, %dh
+#    mov $0x50, %dl
+#    mov $0x07, %ah
+#    mov $0x00, %al
+#    int $0x10 # Очистка экрана/прокрутка
 
-    mov 7, %bh
+    mov $0x0, %bh
     mov $0x02, %ah
-    mov 0, %dl
-    mov 0, %dh
+    mov $0x0, %dl
+    mov $0x0, %dh
     int $0x10 # Установка курсора в заданную позицию
+#    mov 0, %ah
+#    mov 0, %al
+#    int $0x10 
  
 # PRINT_HEX <%al>
 #  PRINT_NEWLINE 
