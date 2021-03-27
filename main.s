@@ -36,7 +36,7 @@ scan_key:
     
     mov $msg, %si # put msg address into si / Положить адрес сообшщения msg в si
     mov $0x0, %ah # функция установки видеорежима/очистки экрана
-    mov $0x0, %al # видеорежим 40x25, 16/8 цветов, полутона, CGA/EGA видеоадаптер, адрес b800, монитор Composite
+    mov $0x02, %al # видеорежим 40x25, 16/8 цветов, полутона, CGA/EGA видеоадаптер, адрес b800, монитор Composite
     int $0x10 
  
 print_welcome:
