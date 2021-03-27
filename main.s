@@ -35,6 +35,10 @@ scan_key:
     jne scan_key # Если нет, то снова считываем нажатую кнопку 
     
     mov $msg, %si # put msg address into si / Положить адрес сообшщения msg в si
+    mov $0x0, %ah # функция установки видеорежима/очистки экрана
+    mov $0x0, %al # видеорежим 40x25, 16/8 цветов, полутона, CGA/EGA видеоадаптер, адрес b800, монитор Composite
+    int $0x10 
+ 
 print_welcome:
     lodsb # move byte from address ds:si to al and add 1 to si 
     # Считать байт по адресу DS:(E)SI в AL и добавить 1 к SI
@@ -105,15 +109,12 @@ print_date:
 #    mov $0x00, %al
 #    int $0x10 # Очистка экрана/прокрутка
 
-    mov $0x0, %bh
-    mov $0x02, %ah
-    mov $0x0, %dl
-    mov $0x0, %dh
+    mov $0x0, %bh # номер страницы экрана
+    mov $0x02, %ah # Функция перемещения курсора
+    mov $0x0, %dl # Номер столбца (начиная с левого)
+    mov $0x0, %dh # Номер строки (начиная с верхней)
     int $0x10 # Установка курсора в заданную позицию
-#    mov 0, %ah
-#    mov 0, %al
-#    int $0x10 
- 
+
 # PRINT_HEX <%al>
 #  PRINT_NEWLINE 
     hlt # halt the system // остановить систему
