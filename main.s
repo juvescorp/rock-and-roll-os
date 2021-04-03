@@ -38,7 +38,15 @@ scan_key:
     mov $0x0, %ah # функция установки видеорежима/очистки экрана
     mov $0x02, %al # видеорежим 40x25, 16/8 цветов, полутона, CGA/EGA видеоадаптер, адрес b800, монитор Composite
     int $0x10 
- 
+
+
+    mov $0x0, %bh # номер страницы экрана
+    mov $0x02, %ah # Функция перемещения курсора
+    mov $0x15, %dl # Номер столбца (начиная с левого)
+    mov $0x8, %dh # Номер строки (начиная с верхней)
+    int $0x10 # Установка курсора в заданную позицию
+
+
 print_welcome:
     lodsb # move byte from address ds:si to al and add 1 to si 
     # Считать байт по адресу DS:(E)SI в AL и добавить 1 к SI
@@ -49,10 +57,17 @@ print_welcome:
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
     jmp print_welcome # jump to "print_welcome", next step of a cycle // перейти к метке loop, на следующий шаг цикла
 print_date:
-    mov $0x0d, %al # Carriage return to the beginning of the string // Возврат каретки в начало строки
-    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
-    mov $0x0a, %al # jump to next string // переход в начало следующей строки
-    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
+    mov $0x0, %bh # номер страницы экрана
+    mov $0x02, %ah # Функция перемещения курсора
+    mov $0x0, %dl # Номер столбца (начиная с левого)
+    mov $0x0, %dh # Номер строки (начиная с верхней)
+    int $0x10 # Установка курсора в заданную позицию
+
+
+#    mov $0x0d, %al # Carriage return to the beginning of the string // Возврат каретки в начало строки
+#    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
+#    mov $0x0a, %al # jump to next string // переход в начало следующей строки
+#    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
     mov $0x07, %al # 07 stands for day // 07 - значение для запроса дня месяца
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
     in $0x71, %al ## get date to al in xx format. 19 stands for 2019
@@ -79,7 +94,14 @@ print_date:
     PRINT_TO_SCR # print symbol on a screen // вывести символ на экран
     mov $0x0a, %al # empty string // пустая строка
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
- 
+  
+    mov $0x0, %bh # номер страницы экрана
+    mov $0x02, %ah # Функция перемещения курсора
+    mov $0x48, %dl # Номер столбца (начиная с левого)
+    mov $0x0, %dh # Номер строки (начиная с верхней)
+    int $0x10 # Установка курсора в заданную позицию
+
+
     mov $0x04, %al # 04 stands for hours // 04 - значение для запроса текущего часа 
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
     in $0x71, %al #Get current year in xx-format // Получение текущего часа в формате xx
