@@ -35,8 +35,8 @@ scan_key:
     jne scan_key # Если нет, то снова считываем нажатую кнопку 
     
     mov $msg, %si # put msg address into si / Положить адрес сообшщения msg в si
-    mov $0x0, %ah # функция установки видеорежима/очистки экрана
-    mov $0x02, %al # видеорежим 40x25, 16/8 цветов, полутона, CGA/EGA видеоадаптер, адрес b800, монитор Composite
+    mov $0x0, %ah # // Function of videomode setting/claering the screen // функция установки видеорежима/очистки экрана
+    mov $0x02, %al # // Videomode 40x25, 16/8 colors, semitones, CGA/EGA, address b800, Composite monitor // видеорежим 40x25, 16/8 цветов, полутона, CGA/EGA видеоадаптер, адрес b800, монитор Composite
     int $0x10 
 
 
@@ -95,11 +95,11 @@ print_date:
     mov $0x0a, %al # empty string // пустая строка
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
   
-    mov $0x0, %bh # номер страницы экрана
-    mov $0x02, %ah # Функция перемещения курсора
-    mov $0x48, %dl # Номер столбца (начиная с левого)
-    mov $0x0, %dh # Номер строки (начиная с верхней)
-    int $0x10 # Установка курсора в заданную позицию
+    mov $0x0, %bh # number of the screen page // номер страницы экрана
+    mov $0x02, %ah # Function of cursor moving // Функция перемещения курсора
+    mov $0x48, %dl # Number of the column (starting from left) // Номер столбца (начиная с левого)
+    mov $0x0, %dh # Number of the row (starting from top) // Номер строки (начиная с верхней)
+    int $0x10 # Move the cursor to the position specified // Установка курсора в заданную позицию
 
 
     mov $0x04, %al # 04 stands for hours // 04 - значение для запроса текущего часа 
