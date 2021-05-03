@@ -137,6 +137,9 @@ print_date:
     mov $0x0, %dh # Номер строки (начиная с верхней) / Number of the string (from the top)
     int $0x10 # Установка курсора в заданную позицию / Move cursor to the position specified
 
+# Здесь будет вывод содержимого регистров // There will be a printing of the contents of the registers
+# Регистры должны выводиться в нижней строке экрана (вычислить её номер) // Resisters should be printed on the bottom string of the screen (number of the string should be calculated) 
+
 # PRINT_HEX <%al>
 #  PRINT_NEWLINE 
     hlt # halt the system // остановить систему
