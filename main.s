@@ -131,11 +131,11 @@ print_date:
 #    mov $0x00, %al
 #    int $0x10 # Очистка экрана/прокрутка
 
-    mov $0x0, %bh # номер страницы экрана
-    mov $0x02, %ah # Функция перемещения курсора
-    mov $0x0, %dl # Номер столбца (начиная с левого)
-    mov $0x0, %dh # Номер строки (начиная с верхней)
-    int $0x10 # Установка курсора в заданную позицию
+    mov $0x0, %bh # number of the page of the screen / номер страницы экрана
+    mov $0x02, %ah # Function of cursor moving / Функция перемещения курсора
+    mov $0x0, %dl # Номер столбца (начиная с левого) / Number of the column (from left)
+    mov $0x0, %dh # Номер строки (начиная с верхней) / Number of the string (from the top)
+    int $0x10 # Установка курсора в заданную позицию / Move cursor to the position specified
 
 # PRINT_HEX <%al>
 #  PRINT_NEWLINE 
