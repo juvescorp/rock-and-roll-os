@@ -23,15 +23,15 @@
 .endm
 
 scan_key:
-    mov $0x0,%ah # код функции int 16h. Читает буфер из клавиатуры. Ждёт нажатия клавиши, а затем возвращает результат
-    # В ah будет scan-код клавиши.
-    # Если клавиша символьная, то в al будет её ASCII-код, если клавиша функциональная, то в al будет 0
-    int $0x16 # прерывание для работы с клавиатурой
-    PRINT_TO_SCR # выводим на экран символ (соответствующий нажатой клавише)
+    mov $0x0,%ah # code of the function of int 16h. It reads a keyboard buffer, waits for key to be pressed and then returns the result. // код функции int 16h. Читает буфер из клавиатуры. Ждёт нажатия клавиши, а затем возвращает результат
+    # ah will contain a scan-code of the key pressed // В ah будет scan-код клавиши.
+    # If the key is a character key then al will contain its ASCII-code. If the key is a functional key then al will contain zero (0). // Если клавиша символьная, то в al будет её ASCII-код, если клавиша функциональная, то в al будет 0
+    int $0x16 # interrupt working with the keyboard // прерывание для работы с клавиатурой
+    PRINT_TO_SCR # print a symbol corresponding to the key pressed // выводим на экран символ (соответствующий нажатой клавише)
 
-#    cmp 0,%al # Если в al не ноль, то клавиша символьная, повторяем чтение снова
+#    cmp 0,%al # if al has non-zero value then it's a character key, we'll repeat the reading.//Если в al не ноль, то клавиша символьная, повторяем чтение снова
 #    jne scan_key 
-    cmp $0x0d,%al # Если в al 0dh (ASCII-код при нажатии клавиши Enter - символ возврата каретки, CR), то будем выводить сообщение.
+    cmp $0x0d,%al # If al contains 0dh (ASCII-code of Enter key, carriage return symbol - CR) then we'll print a message. // Если в al 0dh (ASCII-код при нажатии клавиши Enter - символ возврата каретки, CR), то будем выводить сообщение.
     jne scan_key # Если нет, то снова считываем нажатую кнопку 
     
     mov $msg, %si # put msg address into si / Положить адрес сообшщения msg в si
@@ -40,11 +40,11 @@ scan_key:
     int $0x10 
 
 
-    mov $0x0, %bh # номер страницы экрана
-    mov $0x02, %ah # Функция перемещения курсора
-    mov $0x15, %dl # Номер столбца (начиная с левого)
-    mov $0x8, %dh # Номер строки (начиная с верхней)
-    int $0x10 # Установка курсора в заданную позицию
+    mov $0x0, %bh # number of the page of the screen / номер страницы экрана
+    mov $0x02, %ah # Function of moving cursor to the place specified // Функция перемещения курсора
+    mov $0x15, %dl # Number of the column (from the left) // Номер столбца (начиная с левого)
+    mov $0x8, %dh # Number of the row (from the top) // Номер строки (начиная с верхней)
+    int $0x10 # Set cursor position //Установка курсора в заданную позицию
 
 
 print_welcome:
