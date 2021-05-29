@@ -125,8 +125,12 @@ print_date:
 # Здесь будет вывод содержимого регистров // There will be a printing of the contents of the registers
 # Регистры должны выводиться в нижней строке экрана (вычислить её номер) // Resisters should be printed on the bottom string of the screen (number of the string should be calculated) 
 
+
+
 # PRINT_HEX <%al>
 #  PRINT_NEWLINE 
     hlt # halt the system // остановить систему
 msg:
     .asciz "Welcome to rock'n'roll OS!!!" # string for printing, ending with zero // строка для вывода, заканчивается нулём
+ax_print:
+    .asciz "AX=" # string "AX=" // строка "AX="
