@@ -29,8 +29,6 @@ scan_key:
     int $0x16 # interrupt working with the keyboard // прерывание для работы с клавиатурой
     PRINT_TO_SCR # print a symbol corresponding to the key pressed // выводим на экран символ (соответствующий нажатой клавише)
 
-#    cmp 0,%al # if al has non-zero value then it's a character key, we'll repeat the reading.//Если в al не ноль, то клавиша символьная, повторяем чтение снова
-#    jne scan_key 
     cmp $0x0d,%al # If al contains 0dh (ASCII-code of Enter key, carriage return symbol - CR) then we'll print a message. // Если в al 0dh (ASCII-код при нажатии клавиши Enter - символ возврата каретки, CR), то будем выводить сообщение.
     jne scan_key # Если нет, то снова считываем нажатую кнопку 
     
@@ -63,11 +61,6 @@ print_date:
     mov $0x0, %dh # Номер строки (начиная с верхней)
     int $0x10 # Установка курсора в заданную позицию
 
-
-#    mov $0x0d, %al # Carriage return to the beginning of the string // Возврат каретки в начало строки
-#    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
-#    mov $0x0a, %al # jump to next string // переход в начало следующей строки
-#    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
     mov $0x07, %al # 07 stands for day // 07 - значение для запроса дня месяца
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
     in $0x71, %al ## get date to al in xx format. 19 stands for 2019
@@ -123,14 +116,6 @@ print_date:
     in $0x71, %al # Get current second in xx-format // Получение текущей секунды в формате xx
     HEX_TO_STR_AND_PRINT
     
-#    mov 0, %cl
-#    mov 0, %ch
-#    mov $0x19, %dh
-#    mov $0x50, %dl
-#    mov $0x07, %ah
-#    mov $0x00, %al
-#    int $0x10 # Очистка экрана/прокрутка
-
     mov $0x0, %bh # number of the page of the screen / номер страницы экрана
     mov $0x02, %ah # Function of cursor moving / Функция перемещения курсора
     mov $0x0, %dl # Номер столбца (начиная с левого) / Number of the column (from left)
