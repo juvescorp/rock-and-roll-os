@@ -22,6 +22,8 @@
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
 .endm
 
+# string printing function is needed / Нужна функция вывода строки
+
 scan_key:
     mov $0x0,%ah # code of the function of int 16h. It reads a keyboard buffer, waits for key to be pressed and then returns the result. // код функции int 16h. Читает буфер из клавиатуры. Ждёт нажатия клавиши, а затем возвращает результат
     # ah will contain a scan-code of the key pressed // В ah будет scan-код клавиши.
@@ -119,16 +121,25 @@ print_date:
     mov $0x0, %bh # number of the page of the screen / номер страницы экрана
     mov $0x02, %ah # Function of cursor moving / Функция перемещения курсора
     mov $0x0, %dl # Номер столбца (начиная с левого) / Number of the column (from left)
-    mov $0x0, %dh # Номер строки (начиная с верхней) / Number of the string (from the top)
+    mov $0x18, %dh # Номер строки (начиная с верхней) / Number of the string (from the top)
     int $0x10 # Установка курсора в заданную позицию / Move cursor to the position specified
-
+    
 # Здесь будет вывод содержимого регистров // There will be a printing of the contents of the registers
 # Регистры должны выводиться в нижней строке экрана (вычислить её номер) // Resisters should be printed on the bottom string of the screen (number of the string should be calculated) 
-
-
+     mov $ax_print, %si # Load the address of "AX=" string / Загрузка адреса строки "AX="
+print_registers:
+    lodsb # move byte from address ds:si to al and add 1 to si 
+    # Считать байт по адресу DS:(E)SI в AL и добавить 1 к SI
+    or %al, %al # logical OR (checking if al=0) 
+    # логическое ИЛИ, проверка, равен ли нулю al
+    jz halt # if zf(zero flag)=0 (means that al=0) then halt the system
+    # если zf(флаг нуля)=0 (это значит, что al=0), то останавливаем систему
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
+    jmp print_registers # jump to "print_registers", next step of a cycle // перейти к метке print_registers, на следующий шаг цикла
 
 # PRINT_HEX <%al>
 #  PRINT_NEWLINE 
+halt:
     hlt # halt the system // остановить систему
 msg:
     .asciz "Welcome to rock'n'roll OS!!!" # string for printing, ending with zero // строка для вывода, заканчивается нулём
