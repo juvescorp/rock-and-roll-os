@@ -135,6 +135,9 @@ print_registers:
     jz halt # if zf(zero flag)=0 (means that al=0) then halt the system
     # если zf(флаг нуля)=0 (это значит, что al=0), то останавливаем систему
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
+    push %ax # Save ax value (will be back later) // Сохраняем значение регистра ax, чтобы в будущем его вернуть 
+    # There will be manipulations for printing out ax value // Здесь будут манипуляции для вывода значения ax 
+    pop %ax # Turn back the ax value // Возвращаем значение регистра ax к исходному
     jmp print_registers # jump to "print_registers", next step of a cycle // перейти к метке print_registers, на следующий шаг цикла
 
 # PRINT_HEX <%al>
