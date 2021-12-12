@@ -126,19 +126,27 @@ print_date:
     
 # Здесь будет вывод содержимого регистров // There will be a printing of the contents of the registers
 # Регистры должны выводиться в нижней строке экрана (вычислить её номер) // Resisters should be printed on the bottom string of the screen (number of the string should be calculated) 
-     mov $ax_print, %si # Load the address of "AX=" string / Загрузка адреса строки "AX="
+    mov $ax_print, %si # Load the address of "AX=" string / Загрузка адреса строки "AX="
 print_registers:
     lodsb # move byte from address ds:si to al and add 1 to si 
     # Считать байт по адресу DS:(E)SI в AL и добавить 1 к SI
+    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
     or %al, %al # logical OR (checking if al=0) 
     # логическое ИЛИ, проверка, равен ли нулю al
-    jz halt # if zf(zero flag)=0 (means that al=0) then halt the system
+    jz print_ax_value # if zf(zero flag)=0 (means that al=0) then halt the system
     # если zf(флаг нуля)=0 (это значит, что al=0), то останавливаем систему
-    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
-    push %ax # Save ax value (will be back later) // Сохраняем значение регистра ax, чтобы в будущем его вернуть 
-    # There will be manipulations for printing out ax value // Здесь будут манипуляции для вывода значения ax 
-    pop %ax # Turn back the ax value // Возвращаем значение регистра ax к исходному
     jmp print_registers # jump to "print_registers", next step of a cycle // перейти к метке print_registers, на следующий шаг цикла
+print_ax_value:
+    mov $0xfffa,%ax # Testing. HEX_TO_STR_AND_PRINT not working for a..f numbers. // Тестирование ax для вывода. На цифрах от a..f не работает.
+    # need to fix HEX_TO_STR_AND_PRINT. No it is DEC_TO_STR_AND_PRINT // Нужно поправить HEX_TO_STR_AND_PRINT. Сейчас это по факту DEC_TO_STR_AND_PRINT
+    push %ax # Save ax value (will be back later) // Сохраняем значение регистра ax, чтобы в будущем его вернуть 
+    # There will be manipulations for printing out ax value // Здесь будут манипуляции для вывода значения ax
+    mov %ah, %al # Сначала будет вывод ah, соответственно, загружаем ah в al / at first we will print out al, so we move ah into al
+    HEX_TO_STR_AND_PRINT # printing out the value in al // Вывод значения из al
+    pop %ax # Turn back the ax value // Возвращаем значение регистра ax к исходному
+    push %ax # Save ax value (will be back later) // Сохраняем значение регистра ax, чтобы в будущем его вернуть 
+    HEX_TO_STR_AND_PRINT # printing out the value in al // Вывод значения из al
+    pop %ax # Turn back the ax value // Возвращаем значение регистра ax к исходному
 
 # PRINT_HEX <%al>
 #  PRINT_NEWLINE 
