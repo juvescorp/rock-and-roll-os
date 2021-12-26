@@ -4,13 +4,30 @@
   int $0x10 # call of BIOS interrupt that will print a symbol on the screen / вызов прерывания BIOS, которое выведет символ на экран
 .endm
 
+.macro DEC_FOR_OUTPUT
+    add $0x30, %al
+.endm
+
+.macro HEX_A_F_FOR_OUTPUT
+    add $0x37, %al
+.endm
+
 .macro HEX_TO_STR_AND_PRINT # procedure for converting two hex digits in al to symbols and print them / процедура для преобразования в символы и вывода двух шестнадцатиричных цифр, находящихся в al 
     # Below is the explanation for preparing number for printing
     # Подготовка к выводу числа на экран показана ниже
     mov %al, %ah # save al to ah / сохраняем al в ah
     and $0x0f, %al # AL contains lower digit of the number / AL содержит младший разряд числа
+    cmp $0x0a, %al # Check if AL is higher or equal than A(10) / Проверяем значение в AL: больше/равно A(10) или нет
+    jae 2f # If higher or equal than process as a hex / Если больше или равно, то обрабатываем, как шестнадцатиричное
+    # Otherwise - as a decimal / Иначе - как десятичное 
+1:
     add $0x30, %al # add 30 to get an ASCII code of digit symbol for printing / добавляем 30, чтобы получить ASCII-код символа соответствующей цифры для вывода на экран
     # For example if a digit is 2 the ASCII code will be 32 / Например, если имеем цифру 2, то её ASCII-код будет 32
+    jmp 3f # jump to preparation for output / переход к подготовке вывода
+2:
+    add $0x37,%al # add 37 to get and ASCII code of HEX digit symbol (A..F) for printing / добавляем 37, чтобы получить ASCII-код шестнадцатиричной цифры-символа для вывода на экран  
+    # Preparing digits for output / Подготовка к выводу цифр
+3:
     shr $4, %ah # shift ah for 4 binary digits to the right / сдвигаем ah на 4 двоичных цифры вправо
     # shift is needed for converting a digit in ah to ASCII-code. For the start we need to move this digit to a lower order
     # сдвиг нужен, чтобы перевести цифру в ah в ASCII-код. Для начала нужно для обработки эту цифру перенести в младший разряд ah 
