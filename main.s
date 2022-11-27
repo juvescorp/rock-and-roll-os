@@ -4,13 +4,13 @@
   int $0x10 # call of BIOS interrupt that will print a symbol on the screen / вызов прерывания BIOS, которое выведет символ на экран
 .endm
 
-.macro DEC_FOR_OUTPUT
-    add $0x30, %al
-.endm
+#.macro DEC_FOR_OUTPUT
+#    add $0x30, %al
+#.endm
 
-.macro HEX_A_F_FOR_OUTPUT
-    add $0x37, %al
-.endm
+#.macro HEX_A_F_FOR_OUTPUT
+#    add $0x37, %al
+#.endm
 
 .macro HEX_TO_STR_AND_PRINT # procedure for converting two hex digits in al to symbols and print them / процедура для преобразования в символы и вывода двух шестнадцатиричных цифр, находящихся в al 
     # Below is the explanation for preparing number for printing
@@ -18,20 +18,26 @@
     mov %al, %ah # save al to ah / сохраняем al в ah
     and $0x0f, %al # AL contains lower digit of the number / AL содержит младший разряд числа
     cmp $0x0a, %al # Check if AL is higher or equal than A(10) / Проверяем значение в AL: больше/равно A(10) или нет
-    jae 2f # If higher or equal than process as a hex / Если больше или равно, то обрабатываем, как шестнадцатиричное
+    jae 1f # If higher or equal than process as a hex / Если больше или равно, то обрабатываем, как шестнадцатиричное
     # Otherwise - as a decimal / Иначе - как десятичное 
-1:
     add $0x30, %al # add 30 to get an ASCII code of digit symbol for printing / добавляем 30, чтобы получить ASCII-код символа соответствующей цифры для вывода на экран
     # For example if a digit is 2 the ASCII code will be 32 / Например, если имеем цифру 2, то её ASCII-код будет 32
-    jmp 3f # jump to preparation for output / переход к подготовке вывода
-2:
+    jmp 2f # jump to preparation for output / переход к подготовке вывода
+1:
     add $0x37,%al # add 37 to get and ASCII code of HEX digit symbol (A..F) for printing / добавляем 37, чтобы получить ASCII-код шестнадцатиричной цифры-символа для вывода на экран  
     # Preparing digits for output / Подготовка к выводу цифр
-3:
+2:
     shr $4, %ah # shift ah for 4 binary digits to the right / сдвигаем ah на 4 двоичных цифры вправо
     # shift is needed for converting a digit in ah to ASCII-code. For the start we need to move this digit to a lower order
     # сдвиг нужен, чтобы перевести цифру в ah в ASCII-код. Для начала нужно для обработки эту цифру перенести в младший разряд ah 
+    cmp $0x0a, %ah # Check if AH is higher or equal than A(10) / Проверяем значение в AH: больше/равно A(10) или нет
+    jae 3f # If higher or equal than process as a hex / Если больше или равно, то обрабатываем, как шестнадцатиричное
     add $0x30, %ah # add 30 to get an ASCII code of digit symbol for printing / добавляем 30, чтобы получить ASCII-код символа соответствующей цифры для вывода на экран
+    jmp 4f  # jump to preparation for output / переход к подготовке вывода
+3:
+    add $0x37,%ah  # add 37 to get and ASCII code of HEX digit symbol (A..F) for printing / добавляем 37, чтобы получить ASCII-код шестнадцатиричной цифры-символа для вывода на экран  
+    # Preparing digits for output / Подготовка к выводу цифр
+4:
     mov %al, %dl # save lower-order HEX-digit to dl / сохраняем младший шестнадцатиричный разряд в dl
     mov %ah, %al # move higher-order HEX-digit to al for further printing / отправляем старший разряд в al для последующего вывода
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
@@ -143,27 +149,27 @@ print_date:
     
 # Здесь будет вывод содержимого регистров // There will be a printing of the contents of the registers
 # Регистры должны выводиться в нижней строке экрана (вычислить её номер) // Resisters should be printed on the bottom string of the screen (number of the string should be calculated) 
-    mov $ax_print, %si # Load the address of "AX=" string / Загрузка адреса строки "AX="
-print_registers:
-    lodsb # move byte from address ds:si to al and add 1 to si 
-    # Считать байт по адресу DS:(E)SI в AL и добавить 1 к SI
-    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
-    or %al, %al # logical OR (checking if al=0) 
-    # логическое ИЛИ, проверка, равен ли нулю al
-    jz print_ax_value # if zf(zero flag)=0 (means that al=0) then halt the system
-    # если zf(флаг нуля)=0 (это значит, что al=0), то останавливаем систему
-    jmp print_registers # jump to "print_registers", next step of a cycle // перейти к метке print_registers, на следующий шаг цикла
-print_ax_value:
-    mov $0xfffa,%ax # Testing. HEX_TO_STR_AND_PRINT not working for a..f numbers. // Тестирование ax для вывода. На цифрах от a..f не работает.
-    # need to fix HEX_TO_STR_AND_PRINT. No it is DEC_TO_STR_AND_PRINT // Нужно поправить HEX_TO_STR_AND_PRINT. Сейчас это по факту DEC_TO_STR_AND_PRINT
-    push %ax # Save ax value (will be back later) // Сохраняем значение регистра ax, чтобы в будущем его вернуть 
-    # There will be manipulations for printing out ax value // Здесь будут манипуляции для вывода значения ax
-    mov %ah, %al # Сначала будет вывод ah, соответственно, загружаем ah в al / at first we will print out al, so we move ah into al
-    HEX_TO_STR_AND_PRINT # printing out the value in al // Вывод значения из al
-    pop %ax # Turn back the ax value // Возвращаем значение регистра ax к исходному
-    push %ax # Save ax value (will be back later) // Сохраняем значение регистра ax, чтобы в будущем его вернуть 
-    HEX_TO_STR_AND_PRINT # printing out the value in al // Вывод значения из al
-    pop %ax # Turn back the ax value // Возвращаем значение регистра ax к исходному
+#    mov $ax_print, %si # Load the address of "AX=" string / Загрузка адреса строки "AX="
+#print_registers:
+#    lodsb # move byte from address ds:si to al and add 1 to si 
+#    # Считать байт по адресу DS:(E)SI в AL и добавить 1 к SI
+#    PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
+#    or %al, %al # logical OR (checking if al=0) 
+#    # логическое ИЛИ, проверка, равен ли нулю al
+#    jz print_ax_value # if zf(zero flag)=0 (means that al=0) then halt the system
+#    # если zf(флаг нуля)=0 (это значит, что al=0), то останавливаем систему
+#    jmp print_registers # jump to "print_registers", next step of a cycle // перейти к метке print_registers, на следующий шаг цикла
+#print_ax_value:
+#    mov $0xfffa,%ax # Testing. HEX_TO_STR_AND_PRINT not working for a..f numbers. // Тестирование ax для вывода. На цифрах от a..f не работает.
+#    # need to fix HEX_TO_STR_AND_PRINT. No it is DEC_TO_STR_AND_PRINT // Нужно поправить HEX_TO_STR_AND_PRINT. Сейчас это по факту DEC_TO_STR_AND_PRINT
+#    push %ax # Save ax value (will be back later) // Сохраняем значение регистра ax, чтобы в будущем его вернуть 
+#    # There will be manipulations for printing out ax value // Здесь будут манипуляции для вывода значения ax
+#    mov %ah, %al # Сначала будет вывод ah, соответственно, загружаем ah в al / at first we will print out al, so we move ah into al
+#    HEX_TO_STR_AND_PRINT # printing out the value in al // Вывод значения из al
+#    pop %ax # Turn back the ax value // Возвращаем значение регистра ax к исходному
+#    push %ax # Save ax value (will be back later) // Сохраняем значение регистра ax, чтобы в будущем его вернуть 
+#    HEX_TO_STR_AND_PRINT # printing out the value in al // Вывод значения из al
+#    pop %ax # Turn back the ax value // Возвращаем значение регистра ax к исходному
 
 # PRINT_HEX <%al>
 #  PRINT_NEWLINE 
