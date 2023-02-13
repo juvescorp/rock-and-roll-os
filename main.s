@@ -62,7 +62,6 @@ scan_key:
     mov $0x02, %al # // Videomode 40x25, 16/8 colors, semitones, CGA/EGA, address b800, Composite monitor // видеорежим 40x25, 16/8 цветов, полутона, CGA/EGA видеоадаптер, адрес b800, монитор Composite
     int $0x10 
 
-
     mov $0x0, %bh # number of the page of the screen / номер страницы экрана
     mov $0x02, %ah # Function of moving cursor to the place specified // Функция перемещения курсора
     mov $0x15, %dl # Number of the column (from the left) // Номер столбца (начиная с левого)
@@ -146,7 +145,19 @@ print_date:
     mov $0x0, %dl # Номер столбца (начиная с левого) / Number of the column (from left)
     mov $0x18, %dh # Номер строки (начиная с верхней) / Number of the string (from the top)
     int $0x10 # Установка курсора в заданную позицию / Move cursor to the position specified
-    
+
+
+ #   There will be a string directly recorded to videomemory // Здесь будет прямая запись строки в видеопамять
+    push %es
+    mov $0x20,%di
+    mov $0xB800,%ax
+    mov %ax,%es
+    mov $0x30,%al
+    mov %es:(%di),%al
+    pop %es
+#   End of direct recording to videomemory // Конец прямой записи в видеопамять
+
+   
 # Здесь будет вывод содержимого регистров // There will be a printing of the contents of the registers
 # Регистры должны выводиться в нижней строке экрана (вычислить её номер) // Resisters should be printed on the bottom string of the screen (number of the string should be calculated) 
 #    mov $ax_print, %si # Load the address of "AX=" string / Загрузка адреса строки "AX="
