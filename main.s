@@ -59,7 +59,7 @@ scan_key:
     
     mov $msg, %si # put msg address into si / Положить адрес сообшщения msg в si
     mov $0x0, %ah # // Function of videomode setting/claering the screen // функция установки видеорежима/очистки экрана
-    mov $0x02, %al # // Videomode 40x25, 16/8 colors, semitones, CGA/EGA, address b800, Composite monitor // видеорежим 40x25, 16/8 цветов, полутона, CGA/EGA видеоадаптер, адрес b800, монитор Composite
+    mov $0x02, %al # // Videomode 80x25, 16/8 colors, semitones, CGA/EGA, address b800, Composite monitor // видеорежим 80x25, 16/8 цветов, полутона, CGA/EGA видеоадаптер, адрес b800, монитор Composite
     int $0x10 
 
     mov $0x0, %bh # number of the page of the screen / номер страницы экрана
@@ -152,7 +152,7 @@ print_date:
     mov $0x20,%di
     mov $0xB800,%ax
     mov %ax,%es
-    mov $0x30,%al
+    mov $0x31,%al
     mov %es:(%di),%al
     pop %es
 #   End of direct recording to videomemory // Конец прямой записи в видеопамять
