@@ -148,13 +148,13 @@ print_date:
 
 
  #   There will be a string directly recorded to videomemory // Здесь будет прямая запись строки в видеопамять
-    push %es
-    mov $0x20,%di
-    mov $0xB800,%ax
-    mov %ax,%es
-    mov $0x31,%al
-    mov %es:(%di),%al
-    pop %es
+    push %es # сохранить в стеке значение сегментного регистра es // save the value of the segment register in stack
+    mov $0x20,%di # Коориданаты буквы DI=160*y+2*x // character coordinates DI=160*y+2*x
+    mov $0xB800,%ax # Сегмент видеопамяти для видеорежима 2 - B800 // Videomemory segment for videomode 2 is B800
+    mov %ax,%es #  Запись адреса сегмента видеопамяти в сегментный регистр es // Move address of videomemory segment to the segremt register es
+    mov $0x31,%al # ASCII-код цифры 1 // ASCII-code of digit 1
+    mov %al,%es:(%di) # Запись символа в видеопамять - вывод символа на экран // Recording the character to videomemory - print the character on the screen
+    pop %es # Восстановление значения сегментного регистра es из стека // Recovering the segment register es value from stack
 #   End of direct recording to videomemory // Конец прямой записи в видеопамять
 
    
