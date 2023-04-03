@@ -89,7 +89,7 @@ print_date:
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
     in $0x71, %al ## get date to al in xx format. 19 stands for 2019
     # Получаем дату в al в формате xx. 19 соответствует 2019.
-    HEX_TO_STR_AND_PRINT
+    HEX_TO_STR_AND_PRINT # Convert two HEX digits in AL into symbols and print // Преобразовать две цифры в AL в символы и вывести на экран
     mov $0x2d, %al # тире/dash
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
 #-----------It needs to make a procedures/functions for date output-----------
@@ -98,7 +98,7 @@ print_date:
     mov $0x08, %al # 08 stands for month // 08 - значение для запроса месяца
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
     in $0x71, %al # Get current month in xx-format // получение текущего месяца в формате xx
-    HEX_TO_STR_AND_PRINT
+    HEX_TO_STR_AND_PRINT # Convert two HEX digits in AL into symbols and print // Преобразовать две цифры в AL в символы и вывести на экран
     mov $0x2d, %al # тире/dash
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
 
@@ -106,7 +106,7 @@ print_date:
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
 
     in $0x71, %al # Get current year in xx-format // Получение текущего года в формате xx
-    HEX_TO_STR_AND_PRINT
+    HEX_TO_STR_AND_PRINT # Convert two HEX digits in AL into symbols and print // Преобразовать две цифры в AL в символы и вывести на экран
     mov $0x0d, %al # Carriage return to the beginning of the string // Возврат каретки в начало строки
     PRINT_TO_SCR # print symbol on a screen // вывести символ на экран
     mov $0x0a, %al # empty string // пустая строка
@@ -122,7 +122,8 @@ print_date:
     mov $0x04, %al # 04 stands for hours // 04 - значение для запроса текущего часа 
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
     in $0x71, %al #Get current year in xx-format // Получение текущего часа в формате xx
-    HEX_TO_STR_AND_PRINT
+    HEX_TO_STR_AND_PRINT # Convert two HEX digits in AL into symbols and print // Преобразовать две цифры в AL в символы и вывести на экран
+
 
     mov $0x3a, %al # ":" // colon symbol // символ двоеточия
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
@@ -130,7 +131,8 @@ print_date:
     mov $0x02, %al # 02 stands for minutes // 02 - значение для запроса текущей минуты
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
     in $0x71, %al # Get current minute in xx-format // Получение текущей минуты в формате xx
-    HEX_TO_STR_AND_PRINT
+    HEX_TO_STR_AND_PRINT # Convert two HEX digits in AL into symbols and print // Преобразовать две цифры в AL в символы и вывести на экран
+
 
     mov $0x3a, %al # ":" // colon symbol // символ двоеточия
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
@@ -138,7 +140,8 @@ print_date:
     mov $0, %al # 0 stands for seconds // 0 - значение для запроса текущей секнды
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
     in $0x71, %al # Get current second in xx-format // Получение текущей секунды в формате xx
-    HEX_TO_STR_AND_PRINT
+    HEX_TO_STR_AND_PRINT # Convert two HEX digits in AL into symbols and print // Преобразовать две цифры в AL в символы и вывести на экран
+
     
     mov $0x0, %bh # number of the page of the screen / номер страницы экрана
     mov $0x02, %ah # Function of cursor moving / Функция перемещения курсора
@@ -148,32 +151,33 @@ print_date:
 
 
  #   There will be a string directly recorded to videomemory // Здесь будет прямая запись строки в видеопамять
-    mov $msg, %si
-    push %es
+    mov $msg, %si # put msg address into si / Положить адрес сообшщения msg в si
+    push %es # сохранить в стеке значение сегментного регистра es // save the value of the segment register in stack
     mov $0xB800,%ax # Сегмент видеопамяти для видеорежима 2 - B800 // Videomemory segment for videomode 2 is B800
     mov %ax,%es #  Запись адреса сегмента видеопамяти в сегментный регистр es // Move address of videomemory segment to the segremt register es
-    mov $0xA0,%di    
+    mov $0xA0,%di # координаты для вывода текста DI=160*y+2*x // coordinates for text output DI=160*y+2*x 
 print_welcome2:
-    lodsb # move byte from address ds:si to al and add 1 to si 
-    # Считать байт по адресу DS:(E)SI в AL и добавить 1 к SI
+    lodsb # move byte (symbol) from address ds:si to al and add 1 to si 
+    # Считать байт (символ) по адресу DS:(E)SI в AL и добавить 1 к SI
     or %al, %al # logical OR (checking if al=0) 
     # логическое ИЛИ проверка, равен ли нулю al
     jz after_print # if zf(zero flag)=0 (means that al=0) then go next
     # если zf(флаг нуля)=0 (это значит, что al=0), то переходим далее
     mov %al,%es:(%di) # видеопамять / videomemory # print symbol on a screen // вывести символ на экран
-    inc %di
-    inc %di
+    inc %di # дважды увеличиваем дважды DI, поскольку символу отводится два байта // increment DI twice because there are two bytes assigned for symbol
+    inc %di # первый байт - ASCII-код символа, второй байт - цвет; мы используем только первый // first byte - ASCII-code of symbol, second byte - color; we are using onle first
     jmp print_welcome2 # jump to "print_welcome2", next step of a cycle // перейти к метке print_welcome2, на следующий шаг цикла
 
 
-    push %es # сохранить в стеке значение сегментного регистра es // save the value of the segment register in stack
-    mov $0xF00,%di # Коориданаты буквы DI=160*y+2*x // character coordinates DI=160*y+2*x
-    mov $0xB800,%ax # Сегмент видеопамяти для видеорежима 2 - B800 // Videomemory segment for videomode 2 is B800
-    mov %ax,%es #  Запись адреса сегмента видеопамяти в сегментный регистр es // Move address of videomemory segment to the segremt register es
-    mov $0x31,%al # ASCII-код цифры 1 // ASCII-code of digit 1
-    mov %al,%es:(%di) # Запись символа в видеопамять - вывод символа на экран // Recording the character to videomemory - print the character on the screen
-    pop %es # Восстановление значения сегментного регистра es из стека // Recovering the segment register es value from stack
+#    push %es # сохранить в стеке значение сегментного регистра es // save the value of the segment register in stack
+#    mov $0xF00,%di # Коориданаты буквы DI=160*y+2*x // character coordinates DI=160*y+2*x
+#    mov $0xB800,%ax # Сегмент видеопамяти для видеорежима 2 - B800 // Videomemory segment for videomode 2 is B800
+#    mov %ax,%es #  Запись адреса сегмента видеопамяти в сегментный регистр es // Move address of videomemory segment to the segremt register es
+#    mov $0x31,%al # ASCII-код цифры 1 // ASCII-code of digit 1
+#    mov %al,%es:(%di) # Запись символа в видеопамять - вывод символа на экран // Recording the character to videomemory - print the character on the screen
+#    pop %es # Восстановление значения сегментного регистра es из стека // Recovering the segment register es value from stack
 #   End of direct recording to videomemory // Конец прямой записи в видеопамять
+
 after_print:
     pop %es
 # Здесь будет вывод содержимого регистров // There will be a printing of the contents of the registers
