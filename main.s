@@ -169,15 +169,6 @@ print_welcome2:
     jmp print_welcome2 # jump to "print_welcome2", next step of a cycle // перейти к метке print_welcome2, на следующий шаг цикла
 
 
-#    push %es # сохранить в стеке значение сегментного регистра es // save the value of the segment register in stack
-#    mov $0xF00,%di # Коориданаты буквы DI=160*y+2*x // character coordinates DI=160*y+2*x
-#    mov $0xB800,%ax # Сегмент видеопамяти для видеорежима 2 - B800 // Videomemory segment for videomode 2 is B800
-#    mov %ax,%es #  Запись адреса сегмента видеопамяти в сегментный регистр es // Move address of videomemory segment to the segremt register es
-#    mov $0x31,%al # ASCII-код цифры 1 // ASCII-code of digit 1
-#    mov %al,%es:(%di) # Запись символа в видеопамять - вывод символа на экран // Recording the character to videomemory - print the character on the screen
-#    pop %es # Восстановление значения сегментного регистра es из стека // Recovering the segment register es value from stack
-#   End of direct recording to videomemory // Конец прямой записи в видеопамять
-
 after_print:
     pop %es
 # Здесь будет вывод содержимого регистров // There will be a printing of the contents of the registers
