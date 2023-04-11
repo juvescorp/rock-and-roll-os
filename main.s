@@ -4,6 +4,14 @@
   int $0x10 # call of BIOS interrupt that will print a symbol on the screen / вызов прерывания BIOS, которое выведет символ на экран
 .endm
 
+.macro PRINT_TO_SCR_VIDEOMEM # procedure for printing a symbol on the screen through videomemory / процедура для вывода символа на экран через видеопамять
+ push %es # Save ES in stack / Сохранить значение регистра ES в стеке
+ mov $0xB800,%ax # Сегмент видеопамяти для видеорежима 2 - B800 // Videomemory segment for videomode 2 is B800
+# Coordinates argument needed / нужен аргумент для координат на экране
+ mov %ax,%es #  Запись адреса сегмента видеопамяти в сегментный регистр es // Move address of videomemory segment to the segremt register es
+ pop  %es # Turn back ES from stack / Вернуть значение ES из стека
+.endm
+
 #.macro DEC_FOR_OUTPUT
 #    add $0x30, %al
 #.endm
@@ -185,7 +193,7 @@ after_print:
 #    jmp print_registers # jump to "print_registers", next step of a cycle // перейти к метке print_registers, на следующий шаг цикла
 #print_ax_value:
 #    mov $0xfffa,%ax # Testing. HEX_TO_STR_AND_PRINT not working for a..f numbers. // Тестирование ax для вывода. На цифрах от a..f не работает.
-#    # need to fix HEX_TO_STR_AND_PRINT. No it is DEC_TO_STR_AND_PRINT // Нужно поправить HEX_TO_STR_AND_PRINT. Сейчас это по факту DEC_TO_STR_AND_PRINT
+#    # need to fix HEX_TO_STR_AND_PRINT. Now it is DEC_TO_STR_AND_PRINT // Нужно поправить HEX_TO_STR_AND_PRINT. Сейчас это по факту DEC_TO_STR_AND_PRINT
 #    push %ax # Save ax value (will be back later) // Сохраняем значение регистра ax, чтобы в будущем его вернуть 
 #    # There will be manipulations for printing out ax value // Здесь будут манипуляции для вывода значения ax
 #    mov %ah, %al # Сначала будет вывод ah, соответственно, загружаем ah в al / at first we will print out al, so we move ah into al
