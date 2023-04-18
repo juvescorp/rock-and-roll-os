@@ -4,12 +4,13 @@
   int $0x10 # call of BIOS interrupt that will print a symbol on the screen / вызов прерывания BIOS, которое выведет символ на экран
 .endm
 
-.macro PRINT_TO_SCR_VIDEOMEM # procedure for printing a symbol on the screen through videomemory / процедура для вывода символа на экран через видеопамять
+.macro PRINT_TO_SCR_VIDEOMEM coordinates # procedure for printing a symbol on the screen through videomemory / процедура для вывода символа на экран через видеопамять
  push %es # Save ES in stack / Сохранить значение регистра ES в стеке
  mov $0xB800,%ax # Сегмент видеопамяти для видеорежима 2 - B800 // Videomemory segment for videomode 2 is B800
-# Coordinates argument needed / нужен аргумент для координат на экране
+ mov coordinates,%di # координаты для вывода текста DI=160*y+2*x // coordinates for text output DI=160*y+2*x 
  mov %ax,%es #  Запись адреса сегмента видеопамяти в сегментный регистр es // Move address of videomemory segment to the segremt register es
- pop  %es # Turn back ES from stack / Вернуть значение ES из стека
+ mov %al,%es:(%di) # видеопамять / videomemory # print symbol on a screen // вывести символ на экран
+ pop %es # Turn back ES from stack / Вернуть значение ES из стека
 .endm
 
 #.macro DEC_FOR_OUTPUT
