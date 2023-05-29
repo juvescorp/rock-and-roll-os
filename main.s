@@ -1,17 +1,18 @@
 .code16 # tells GAS to output 16-bit code / Компиляция в 16-битный код
+
 .macro PRINT_TO_SCR # procedure for printing symbol to the screen / макрокоманда (процедура/функция) для вывода символа на экран 
   mov $0x0e, %ah # load 0e - code of a screen output BIOS function / загрузка 0e, кода функции вывода на экран BIOS
   int $0x10 # call of BIOS interrupt that will print a symbol on the screen / вызов прерывания BIOS, которое выведет символ на экран
 .endm
 
 .macro PRINT_TO_SCR_VIDEOMEM coordinates,symbol # procedure for printing a symbol on the screen through videomemory / процедура для вывода символа на экран через видеопамять
- push %es # Save ES in stack / Сохранить значение регистра ES в стеке
- mov $0xB800,%ax # Сегмент видеопамяти для видеорежима 2 - B800 // Videomemory segment for videomode 2 is B800
- mov \coordinates,%di # координаты для вывода текста DI=160*y+2*x // coordinates for text output DI=160*y+2*x 
- mov %ax,%es #  Запись адреса сегмента видеопамяти в сегментный регистр es // Move address of videomemory segment to the segremt register es
- mov \symbol,%al
- mov %al,%es:(%di) # видеопамять / videomemory # print symbol on a screen // вывести символ на экран
- pop %es # Turn back ES from stack / Вернуть значение ES из стека
+  push %es # Save ES in stack / Сохранить значение регистра ES в стеке
+  mov $0xB800,%ax # Сегмент видеопамяти для видеорежима 2 - B800 // Videomemory segment for videomode 2 is B800
+  mov \coordinates,%di # координаты для вывода текста DI=160*y+2*x // coordinates for text output DI=160*y+2*x 
+  mov %ax,%es #  Запись адреса сегмента видеопамяти в сегментный регистр es // Move address of videomemory segment to the segremt register es
+  mov \symbol,%al
+  mov %al,%es:(%di) # видеопамять / videomemory # print symbol on a screen // вывести символ на экран
+  pop %es # Turn back ES from stack / Вернуть значение ES из стека
 .endm
 
 #.macro DEC_FOR_OUTPUT
@@ -70,7 +71,7 @@ scan_key:
     mov $msg, %si # put msg address into si / Положить адрес сообшщения msg в si
     mov $0x0, %ah # // Function of videomode setting/claering the screen // функция установки видеорежима/очистки экрана
     mov $0x02, %al # // Videomode 80x25, 16/8 colors, semitones, CGA/EGA, address b800, Composite monitor // видеорежим 80x25, 16/8 цветов, полутона, CGA/EGA видеоадаптер, адрес b800, монитор Composite
-    int $0x10 
+    int $0x10 # Set videomode / Установка видеорежима 
 
     mov $0x0, %bh # number of the page of the screen / номер страницы экрана
     mov $0x02, %ah # Function of moving cursor to the place specified // Функция перемещения курсора
@@ -89,11 +90,11 @@ print_welcome:
     PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
     jmp print_welcome # jump to "print_welcome", next step of a cycle // перейти к метке loop, на следующий шаг цикла
 print_date:
-    mov $0x0, %bh # номер страницы экрана
-    mov $0x02, %ah # Функция перемещения курсора
-    mov $0x0, %dl # Номер столбца (начиная с левого)
-    mov $0x0, %dh # Номер строки (начиная с верхней)
-    int $0x10 # Установка курсора в заданную позицию
+    mov $0x0, %bh # номер страницы экрана / number of page of the screen
+    mov $0x02, %ah # Функция перемещения курсора / function of moving cursor to the coordinates 
+    mov $0x0, %dl # Номер столбца (начиная с левого) / number of the column (from the left)
+    mov $0x0, %dh # Номер строки (начиная с верхней) / number of the row (from the top)
+    int $0x10 # Установка курсора в заданную позицию / Set cursor position
 
     mov $0x07, %al # 07 stands for day // 07 - значение для запроса дня месяца
     out %al, $0x70 # requesting current date/time // запрос текущей даты/времени
@@ -180,10 +181,10 @@ print_welcome2:
 
 
 after_print:
-    pop %es
-    mov $0x32,%dl
-    mov $0xB0,%bx
-    PRINT_TO_SCR_VIDEOMEM %bx,%dl
+    pop %es # вернуть из стека значение сегментного регистра es // Turn back es register value from stack
+    mov $0x32,%dl # В dl - координаты выводимого символа // dl contains coordinates for printed symbol 
+    mov $0xB0,%bx # В bx - ASCII-код выводимого символа // bx contains ASCII-code for printed symbol
+    PRINT_TO_SCR_VIDEOMEM %bx,%dl # применение функции/макрокоманды для вывода символа на экран через видеопамять // function/macro for printing a symbol on the screen through videomemory
     
 # Здесь будет вывод содержимого регистров // There will be a printing of the contents of the registers
 # Регистры должны выводиться в нижней строке экрана (вычислить её номер) // Resisters should be printed on the bottom string of the screen (number of the string should be calculated) 
