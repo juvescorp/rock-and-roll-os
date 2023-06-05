@@ -10,9 +10,31 @@
   mov $0xB800,%ax # Сегмент видеопамяти для видеорежима 2 - B800 // Videomemory segment for videomode 2 is B800
   mov \coordinates,%di # координаты для вывода текста DI=160*y+2*x // coordinates for text output DI=160*y+2*x 
   mov %ax,%es #  Запись адреса сегмента видеопамяти в сегментный регистр es // Move address of videomemory segment to the segremt register es
-  mov \symbol,%al
+  mov \symbol,%al # move ASCII-code of the symbol into al // Запись ASCII-кода символа в al 
   mov %al,%es:(%di) # видеопамять / videomemory # print symbol on a screen // вывести символ на экран
   pop %es # Turn back ES from stack / Вернуть значение ES из стека
+.endm
+
+.macro PRINT_STRING_TO_SCR_VIDEOMEM coordinates,string_address # procedure for printing a string on the screen through videomemory / процедура для вывода строки на экран через видеопамять
+ push %es # Save ES in stack / Сохранить значение регистра ES в стеке
+ mov $0xB000,%ax # Сегмент видеопаяти для режима 2 - B800 // Videomemory segment for videomode 2 is B000
+ mov \coordinates,%di # координаты для вывода текста DI=160*y+2*x // coordinates for text output DI=160*y+2*x
+ mov %ax,%es # запись сегмента видеопамяти в сегментный регистр es // Move address of videomemory segment to the segment register es
+ mov \string_address,%si # запись адреса строки в si // move string address to si
+print_next_symbol:
+ lodsb # move byte from address ds:si to al and add 1 to si 
+ # Считать байт по адресу DS:(E)SI в AL и добавить 1 к SI
+ or %al, %al # logical OR (checking if al=0) 
+ # логическое ИЛИ проверка, равен ли нулю al
+ jz print_str_end # if zf(zero flag)=0 (means that al=0) then it's end of the string, finish printing
+ # если zf(флаг нуля)=0 (это значит, что al=0), то это конец строки, завершаем вывод
+ stosb  # move byte from al to address es:di and add 1 to di: print a symbol through videomemory and move to next symbol
+ # Записать байт из AL по адресу ES:(E)DI и добавить 1 к DI: вывод символа через видеопамять и переход к следующему символу
+# PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
+ jmp print_next_symbol # jump to next step of a cycle // перейти на следующий шаг цикла
+p
+print_str_end:
+ pop %es # Turn back ES from stack / Вернуть значение ES из стека
 .endm
 
 #.macro DEC_FOR_OUTPUT
