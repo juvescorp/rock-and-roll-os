@@ -20,7 +20,7 @@
  mov $0xB000,%ax # Сегмент видеопаяти для режима 2 - B800 // Videomemory segment for videomode 2 is B000
  mov \coordinates,%di # координаты для вывода текста DI=160*y+2*x // coordinates for text output DI=160*y+2*x
  mov %ax,%es # запись сегмента видеопамяти в сегментный регистр es // Move address of videomemory segment to the segment register es
- mov \string_address,%si # запись адреса строки в si // move string address to si
+ mov $\string_address,%si # запись адреса строки в si // move string address to si
 print_next_symbol:
  lodsb # move byte from address ds:si to al and add 1 to si 
  # Считать байт по адресу DS:(E)SI в AL и добавить 1 к SI
@@ -30,9 +30,8 @@ print_next_symbol:
  # если zf(флаг нуля)=0 (это значит, что al=0), то это конец строки, завершаем вывод
  stosb  # move byte from al to address es:di and add 1 to di: print a symbol through videomemory and move to next symbol
  # Записать байт из AL по адресу ES:(E)DI и добавить 1 к DI: вывод символа через видеопамять и переход к следующему символу
-# PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
+                                      # PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
  jmp print_next_symbol # jump to next step of a cycle // перейти на следующий шаг цикла
-p
 print_str_end:
  pop %es # Turn back ES from stack / Вернуть значение ES из стека
 .endm
@@ -208,6 +207,10 @@ after_print:
     mov $0xB0,%bx # В bx - ASCII-код выводимого символа // bx contains ASCII-code for printed symbol
     PRINT_TO_SCR_VIDEOMEM %bx,%dl # применение функции/макрокоманды для вывода символа на экран через видеопамять // function/macro for printing a symbol on the screen through videomemory
     
+
+    mov $0x140,%bx  
+    PRINT_STRING_TO_SCR_VIDEOMEM %bx,msg
+ 
 # Здесь будет вывод содержимого регистров // There will be a printing of the contents of the registers
 # Регистры должны выводиться в нижней строке экрана (вычислить её номер) // Resisters should be printed on the bottom string of the screen (number of the string should be calculated) 
 #    mov $ax_print, %si # Load the address of "AX=" string / Загрузка адреса строки "AX="
