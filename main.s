@@ -17,22 +17,25 @@
 
 .macro PRINT_STRING_TO_SCR_VIDEOMEM coordinates,string_address # procedure for printing a string on the screen through videomemory / процедура для вывода строки на экран через видеопамять
  push %es # Save ES in stack / Сохранить значение регистра ES в стеке
- mov $0xB000,%ax # Сегмент видеопаяти для режима 2 - B800 // Videomemory segment for videomode 2 is B000
- mov \coordinates,%di # координаты для вывода текста DI=160*y+2*x // coordinates for text output DI=160*y+2*x
+ mov $0xB800,%ax # Сегмент видеопаяти для режима 2 - B800 // Videomemory segment for videomode 2 is B800
  mov %ax,%es # запись сегмента видеопамяти в сегментный регистр es // Move address of videomemory segment to the segment register es
- mov $\string_address,%si # запись адреса строки в si // move string address to si
-print_next_symbol:
+ mov \coordinates,%di # координаты для вывода текста DI=160*y+2*x // coordinates for text output DI=160*y+2*x
+ mov \string_address,%si # запись адреса строки в si // move string address to si
+1:
  lodsb # move byte from address ds:si to al and add 1 to si 
  # Считать байт по адресу DS:(E)SI в AL и добавить 1 к SI
  or %al, %al # logical OR (checking if al=0) 
  # логическое ИЛИ проверка, равен ли нулю al
- jz print_str_end # if zf(zero flag)=0 (means that al=0) then it's end of the string, finish printing
+ jz 2f # if zf(zero flag)=0 (means that al=0) then it's end of the string, finish printing
  # если zf(флаг нуля)=0 (это значит, что al=0), то это конец строки, завершаем вывод
- stosb  # move byte from al to address es:di and add 1 to di: print a symbol through videomemory and move to next symbol
+ #stosb  # move byte from al to address es:di and add 1 to di: print a symbol through videomemory and move to next symbol
  # Записать байт из AL по адресу ES:(E)DI и добавить 1 к DI: вывод символа через видеопамять и переход к следующему символу
-                                      # PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
- jmp print_next_symbol # jump to next step of a cycle // перейти на следующий шаг цикла
-print_str_end:
+ mov %al,%es:(%di) # видеопамять / videomemory # print symbol on a screen // вывести символ на экран
+ inc %di # дважды увеличиваем дважды DI, поскольку символу отводится два байта // increment DI twice because there are two bytes assigned for symbol
+ inc %di # первый байт - ASCII-код символа, второй байт - цвет; мы используем только первый // first byte - ASCII-code of symbol, second byte - color; we are using onle first
+    #                                     # PRINT_TO_SCR # int $0x10 # print symbol on a screen // вывести символ на экран
+ jmp 1b # jump to next step of a cycle // перейти на следующий шаг цикла
+2:
  pop %es # Turn back ES from stack / Вернуть значение ES из стека
 .endm
 
@@ -174,6 +177,8 @@ print_date:
     in $0x71, %al # Get current second in xx-format // Получение текущей секунды в формате xx
     HEX_TO_STR_AND_PRINT # Convert two HEX digits in AL into symbols and print // Преобразовать две цифры в AL в символы и вывести на экран
 
+
+
     
     mov $0x0, %bh # number of the page of the screen / номер страницы экрана
     mov $0x02, %ah # Function of cursor moving / Функция перемещения курсора
@@ -183,22 +188,22 @@ print_date:
 
 
  #   There will be a string directly recorded to videomemory // Здесь будет прямая запись строки в видеопамять
-    mov $msg, %si # put msg address into si / Положить адрес сообшщения msg в si
-    push %es # сохранить в стеке значение сегментного регистра es // save the value of the segment register in stack
-    mov $0xB800,%ax # Сегмент видеопамяти для видеорежима 2 - B800 // Videomemory segment for videomode 2 is B800
-    mov %ax,%es #  Запись адреса сегмента видеопамяти в сегментный регистр es // Move address of videomemory segment to the segremt register es
-    mov $0xA0,%di # координаты для вывода текста DI=160*y+2*x // coordinates for text output DI=160*y+2*x 
-print_welcome2:
-    lodsb # move byte (symbol) from address ds:si to al and add 1 to si 
-    # Считать байт (символ) по адресу DS:(E)SI в AL и добавить 1 к SI
-    or %al, %al # logical OR (checking if al=0) 
-    # логическое ИЛИ проверка, равен ли нулю al
-    jz after_print # if zf(zero flag)=0 (means that al=0) then go next
-    # если zf(флаг нуля)=0 (это значит, что al=0), то переходим далее
-    mov %al,%es:(%di) # видеопамять / videomemory # print symbol on a screen // вывести символ на экран
-    inc %di # дважды увеличиваем дважды DI, поскольку символу отводится два байта // increment DI twice because there are two bytes assigned for symbol
-    inc %di # первый байт - ASCII-код символа, второй байт - цвет; мы используем только первый // first byte - ASCII-code of symbol, second byte - color; we are using onle first
-    jmp print_welcome2 # jump to "print_welcome2", next step of a cycle // перейти к метке print_welcome2, на следующий шаг цикла
+#    mov $msg, %si # put msg address into si / Положить адрес сообшщения msg в si
+#    push %es # сохранить в стеке значение сегментного регистра es // save the value of the segment register in stack
+#    mov $0xB800,%ax # Сегмент видеопамяти для видеорежима 2 - B800 // Videomemory segment for videomode 2 is B800
+#    mov %ax,%es #  Запись адреса сегмента видеопамяти в сегментный регистр es // Move address of videomemory segment to the segremt register es
+#    mov $0xA0,%di # координаты для вывода текста DI=160*y+2*x // coordinates for text output DI=160*y+2*x 
+#print_welcome2:
+#    lodsb # move byte (symbol) from address ds:si to al and add 1 to si 
+#    # Считать байт (символ) по адресу DS:(E)SI в AL и добавить 1 к SI
+#    or %al, %al # logical OR (checking if al=0) 
+#    # логическое ИЛИ проверка, равен ли нулю al
+#    jz after_print # if zf(zero flag)=0 (means that al=0) then go next
+#    # если zf(флаг нуля)=0 (это значит, что al=0), то переходим далее
+#    mov %al,%es:(%di) # видеопамять / videomemory # print symbol on a screen // вывести символ на экран
+#    inc %di # дважды увеличиваем дважды DI, поскольку символу отводится два байта // increment DI twice because there are two bytes assigned for symbol
+#    inc %di # первый байт - ASCII-код символа, второй байт - цвет; мы используем только первый // first byte - ASCII-code of symbol, second byte - color; we are using onle first
+#    jmp print_welcome2 # jump to "print_welcome2", next step of a cycle // перейти к метке print_welcome2, на следующий шаг цикла
 
 
 after_print:
@@ -208,8 +213,9 @@ after_print:
     PRINT_TO_SCR_VIDEOMEM %bx,%dl # применение функции/макрокоманды для вывода символа на экран через видеопамять // function/macro for printing a symbol on the screen through videomemory
     
 
-    mov $0x140,%bx  
-    PRINT_STRING_TO_SCR_VIDEOMEM %bx,msg
+    mov $0x140,%bx 
+    mov $msg,%dx 
+    PRINT_STRING_TO_SCR_VIDEOMEM %bx,%dx
  
 # Здесь будет вывод содержимого регистров // There will be a printing of the contents of the registers
 # Регистры должны выводиться в нижней строке экрана (вычислить её номер) // Resisters should be printed on the bottom string of the screen (number of the string should be calculated) 
